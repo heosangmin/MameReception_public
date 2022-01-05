@@ -1,0 +1,61 @@
+body  {
+	font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "メイリオ", "Meiryo UI",Meiryo, Osaka, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+}
+
+th {
+	text-align: center;
+}
+
+.width-10per {width:10%;}
+.width-13per {width:13%;}
+.width-14per {width:14%;}
+.width-15per {width:15%;}
+.width-20per {width:20%;}
+
+.logo {float:right;width:40px;}
+.titleWrap {float:right;}
+.header {float:right;padding:10px;}
+.footer {float:right;padding:10px;}
+.systemTitle {margin:auto;}
+.title {margin:auto;}
+.msgBox {padding:10px;}
+.search {padding-bottom:5px;}
+
+.dropdown-menu-custom {
+	min-width: 50px;
+}
+
+#div_errMsg {margin:10px;}
+#worklist {padding:10px;}
+#worklist td {vertical-align: middle;}
+#worklist .work-process-time {width:50px;}
+#worklist .work-detail {max-width:300px;}
+#worklist .work-manage {max-width:300px;}
+
+#workdetail th {background-color:#eeeeee;}
+#workdetail pre {border:none;}
+#workdetail dd {margin-bottom:10px;}
+#workdetail .line-height-2em {line-height: 2em}
+#workdetail .font-size-1dot2em {font-size:1.2em;}
+#workdetail .work-print-seal {margin-bottom: 0;display: none;}
+#workdetail .work-print-seal td {height: 70px;}
+
+.bgcolor_danger {background-color: #f2dede;}
+
+#clist {padding:10px;}
+#calllist {border-right: 1px solid #dddddd;}
+#calllist table {margin-top:15px;}
+#calllist-statistics table {margin-top:15px;}
+
+@media print {
+	.header,.footer,.nav,.close,.alert-success {display: none}
+	#worklist {display: none}
+	#workinput {display: none}
+	#div_errMsg {display: none !important}
+
+	#workdetail {overflow-y: hidden}
+	#workdetail .modal-header button {display: none}
+	#workdetail .modal-footer {display: none}
+	#workdetail .work-record-info {display: none}
+	#workdetail .work-print-seal {display: table;}
+}

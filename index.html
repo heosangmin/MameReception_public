@@ -1,0 +1,676 @@
+﻿<!DOCTYPE html>
+<html manifest="manifest.appcache">
+<head>
+	<title>インシデント管理システム : MameReception</title>
+	<link rel="shortcut icon" href="img/dangomame_1.png" />
+	<link rel="stylesheet" href="css/bootstrap.css" />
+	<link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.10.3.custom.css" />
+	<link rel="stylesheet" href="css/chosen.min.css" />
+	<link rel="stylesheet" href="css/MameReception.css" />
+	<link rel="stylesheet" href="css/typeahead.js-bootstrap.css" />
+</head>
+<body id="MameReception">
+
+	<div class="row">
+		<div class="col-md-6">
+			<div id="div_errMsg">
+				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+			</div>
+		</div>
+		<div class="col-md-6 text-right">
+			<div class="header">
+				<div class="titleWrap">
+					<h3 class="systemTitle">team</h3>
+					<span class="systemSubTitle">インシデント管理システム</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="#list" data-toggle="tab">インシデント一覧</a></li>
+		<!-- <li><a href="#statistics" data-toggle="tab">STATISTICS</a></li> -->
+		<!-- <li><a href="#customer" data-toggle="tab">顧客一覧</a></li> -->
+		<li><a href="#clist" data-toggle="tab">通話記録</a></li>
+	</ul>
+
+	<div class="tab-content">
+
+		<!--*******************************************************************************
+			作業一覧（インシデント）
+		*******************************************************************************-->
+		<div class="tab-pane active" id="list">
+
+			<div id="worklist" data-rowsPerPage="10" data-pagesPerPage="10">
+				<div class="row">
+					<div class="col-md-1">
+						<select class="form-control input-sm select-rows">
+							<option value="10">10行</option>
+							<option value="20">20行</option>
+							<option value="30">30行</option>
+							<option value="40">40行</option>
+							<option value="50">50行</option>
+						</select>
+					</div>
+					<div class="col-md-3 text-left">
+						<div class="row">
+							<div class="col-xs-6">
+								<div class="input-group input-group-sm period">
+									<span class="input-group-addon">
+										<span class="glyphicon glyphicon-fast-backward"></span>
+									</span>
+									<input type="text" name="searchdatestart" class="form-control datepicker datepicker-list text-center" placeholder="発生日start" />
+								</div>
+							</div>
+							<div class="col-xs-6">
+								<div class="input-group input-group-sm period">
+									<input type="text" name="searchdateend" class="form-control datepicker datepicker-list text-center" placeholder="発生日end" />
+									<span class="input-group-addon">
+										<span class="glyphicon glyphicon-fast-forward"></span>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-5"></div>
+					
+					<div class="col-md-3">
+						<form>
+							<div class="input-group input-group-sm search">
+								<span class="input-group-btn">
+									<button class="btn btn-default dropdown-toggle search-dropdown-default" data-toggle="dropdown">内容<span class="caret"></span></button>
+									<ul class="dropdown-menu dropdown-menu-custom">
+										<li><a href="#" class="search-dropdown" data-searchtype="person_request" data-placeholder="">発信元</a></li>
+										<li><a href="#" class="search-dropdown" data-searchtype="person_in_charge" data-placeholder="">担当者</a></li>
+										<li><a href="#" class="search-dropdown" data-searchtype="type" data-placeholder="">分類</a></li>
+										<li><a href="#" class="search-dropdown" data-searchtype="title" data-placeholder="">タイトル</a></li>
+										<li><a href="#" class="search-dropdown" data-searchtype="detail" data-placeholder="">内容</a></li>
+										<li><a href="#" class="search-dropdown" data-searchtype="manage" data-placeholder="">対処</a></li>
+									</ul>
+								</span>
+								<input type="text" class="form-control searchtext" name="work_tx_search" maxlength="50" />
+								<span class="input-group-btn">
+									<button class="btn btn-primary btn-search" type="button">Search</button>
+									<button class="btn btn-info btn-reset" type="button">Reset</button>
+								</span>
+							</div>
+						</form>
+					</div>
+				</div>
+				<table class="table table-bordered table-condensed">
+					<thead>
+						<tr>
+							<!-- <th>No</th> -->
+							<th><a class="th-sort" data-sortcolname="id">ID</a></th>
+							<th><a class="th-sort" data-sortcolname="date_start">発生日時</a></th>
+							<th><a class="th-sort" data-sortcolname="date_end">回復日時</a></th>
+							<th><a class="th-sort" data-sortcolname="branch">拠点</a></th>
+							<th><a class="th-sort" data-sortcolname="person_request">発信者</a></th>
+							<th><a class="th-sort" data-sortcolname="person_in_charge">担当者</a></th>
+							<th><a class="th-sort" data-sortcolname="type">分類</a></th>
+							<th><a class="th-sort" data-sortcolname="title">タイトル</a></th>
+							<th>内容（先頭５０桁）</th>
+							<th><a class="th-sort" data-sortcolname="status">状況</a></th>
+							<th><a class="th-sort" data-sortcolname="flag_report">月次</a></th>
+							<th><a class="th-sort" data-sortcolname="final_check">最終確認</a></th>
+							<th>CTRL</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+				<div class="row">
+					<div class="col-md-3 text-left">
+						<div class="action-buttons">
+							<!-- trigger modal -->
+							<button class="btn btn-primary btn-default addwork" data-toggle="modal" data-target="#workinput" title="作業追加">Add</button>
+
+							<!-- CSV Download-->
+							<button class="btn btn-default csv" title="作業一覧CSVダウンロード">CSV</button>
+
+							<!-- 月次CSV Download-->
+							<button class="btn btn-default reportcsv" title="月次報告書CSVダウンロード">月次CSV</button>
+
+							<!-- refresh -->
+							<button class="btn btn-default refresh" title="更新"><span class="loadingImg">refresh</span></button>
+						</div>
+					</div>
+					<div class="col-md-6 text-center"><ul class="pagination"></ul></div>
+					<div class="col-md-3 text-right pageInfo"></div>
+				</div>
+			</div>
+		</div> <!-- end of tab pane #list -->
+
+
+		<!-- *******************************************************************************
+			STATISTICS
+		******************************************************************************* -->
+		<div class="tab-pane" id="statistics">
+
+			<div id="workstatistics">
+				<div class="text-center">
+					<h3>準備中です。</h3>
+				</div>
+			</div>
+
+		</div> <!-- end of tab pane #statistics -->
+
+
+		<!-- *******************************************************************************
+			通話記録
+		******************************************************************************* -->
+		<div class="tab-pane" id="clist">
+
+			<div class="row">
+
+				<!-- left : call list -->
+				<div id="calllist" class="col-xs-9">
+
+					<form id="form_call" action="MameCall.cfc" method="post" class="" role="form">
+
+						<div class="row">
+
+							<div class="col-xs-2">
+
+								<label>発信者</label>
+								<select id="selectPersonCall" class="form-control select-person-call" name="call_sl_person_call">
+									<optgroup label="支店１">
+										<option value="customer1">customer1</option>
+										<option value="customer2">customer2</option>
+										<option value="customer3">customer3</option>
+										<option value="customer4">customer4</option>
+										<option value="customer5">customer5</option>
+										<option value="customer6">customer6</option>
+										<option value="customer7">customer7</option>
+										<option value="customer8">customer8</option>
+										<option value="customer9">customer9</option>
+									</optgroup>
+									<optgroup label="支店２">
+										<option value="customer11">customer11</option>
+										<option value="customer12">customer12</option>
+										<option value="customer13">customer13</option>
+										<option value="customer14">customer14</option>
+										<option value="customer15">customer15</option>
+									</optgroup>
+									<optgroup label="支店３">
+										<option value="customer21">customer21</option>
+										<option value="customer22">customer22</option>
+										<option value="customer23">customer23</option>
+										<option value="customer24">customer24</option>
+										<option value="customer25">customer25</option>
+									</optgroup>
+									<option value="その他">その他</option>
+								</select>
+							</div>
+
+							<div class="col-xs-2">
+								<label>受信者</label>
+								<select id="selectPersonTake" class="form-control select-person-take" name="call_sl_person_take">
+									<option value="user1">user1</option>
+									<option value="user2">user2</option>
+									<option value="user3">user3</option>
+									<option value="user4">user4</option>
+									<option value="user5">user5</option>
+								</select>
+							</div>
+
+							<div class="col-xs-2">
+								<label>通話時間</label>
+								<select id="selectCallTime" class="form-control select-call-duration" name="call_sl_duration"></select>
+							</div>
+
+							<div class="col-xs-3">
+								<label>コメント</label>
+								<input type="text" class="form-control init" name="call_tx_comment" placeholder="" maxlength="100" />
+							</div>
+
+							<div class="col-xs-2">
+								<label>インシデント</label>
+								<select id="selectIncident" class="form-control select-incident init" name="call_sl_incident">
+									<option>なし</option>
+									<option v-for="work in worklist" v-bind:value="work.id">【{{work.id}}】（{{work.person_request}}→{{work.person_in_charge}}）{{work.title}}</option>
+								</select>
+							</div>
+
+							<div class="col-xs-1">
+								<label></label>
+								<button type="button" class="call-send btn btn-primary btn-lg">登録</button>
+							</div>
+
+						</div>
+
+						<div class="row"></div>
+
+					</form>
+
+					<table class="table table-striped table-bordered table-condensed">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th class="width-15per">登録時刻</th>
+								<th class="width-10per">通話時間（分）</th>
+								<th>発信元</th>
+								<th>対応者</th>
+								<th>コメント</th>
+								<th class="width-10per">インシデントID</th>
+								<th class="width-10per">操作</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+
+					<div class="row">
+						<div class="col-md-3 text-left">
+							<div class="action-buttons">
+								<!-- refresh -->
+								<button class="btn btn-default refresh" title="更新"><span class="loadingImg">refresh</span></button>
+							</div>
+						</div>
+						<div class="col-md-6 text-center"><ul class="pagination"></ul></div>
+						<div class="col-md-3 text-right pageInfo"></div>
+					</div>
+
+				</div>
+
+				<!-- right : statistics -->
+				<div id="calllist-statistics" class="col-xs-3">
+					<div class="row">
+						<div class="col-xs-12">
+							<label>対象年月</label>
+							<select id="selectCallStatisticsMonth" class="form-control" v-on:change="refreshCallStatistics">
+								<option v-for="ym in ymlist" v-bind:value="ym.text">{{ ym.text }}</option>
+							</select>
+						</div>
+					</div>
+					<table class="table table-bordered statistics">
+						<thead>
+							<th>発信者</th>
+							<th>対応者</th>
+							<th>回数</th>
+							<th>合計時間</th>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+
+			</div> <!-- end of row -->
+
+		</div> <!-- end of tab pane #calllist -->
+
+	</div>
+
+	<!-- Modal : workinput-->
+	<div class="modal fade" id="workinput" tabindex="-1" role="dialog" aria-labelledby="workinputModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				
+				<form id="form_workinput" action="MameReception.cfc" method="post" class="" role="form">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h3 class="modal-title" id="workinputModalLabel">作業追加</h3>
+					</div>
+			
+					<div class="modal-body">
+
+						<div class="row form-group">
+							<div class="col-md-4">
+								<label for="datepicker_start">発生日時</label>
+								<div class="input-group">
+									<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+  									<input id="datepicker_start" class="form-control datepicker text-center" name="work_tx_date_start"/>
+  								</div>
+  							</div>
+  							<div class="col-md-4">
+  								<label for="datepicker_demand" class="">納期</label>
+  								<div class="input-group">
+  									<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+  									<input id="datepicker_demand" class="form-control datepicker text-center" name="work_tx_date_demand"/>
+  								</div>
+  							</div>
+  							<div class="col-md-4">
+  								<label for="datepicker_end" class="">回復日時</label>
+  								<div class="input-group">
+  									<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+  									<input id="datepicker_end" class="form-control datepicker text-center" name="work_tx_date_end"/>
+  								</div>
+  							</div>
+						</div>
+
+						<div class="form-group" class="branch">
+							<label>拠点</label>
+							<div>
+								<p>
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_branch" id="branchRadio_z" value="支店Z"/>
+										支店Z
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_branch" id="branchRadio_k" value="支店K"/>
+										支店K
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_branch" id="branchRadio_a" value="支店A"/>
+										支店A
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_branch" id="branchRadio_b" value="支店B"/>
+										支店B
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_branch" id="branchRadio_d" value="支店D"/>
+										支店D
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_branch" id="branchRadio_f" value="支店E"/>
+										支店E
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_branch" id="branchRadio_p" value="支店N"/>
+										支店N
+									</label>
+								</p>
+								<p>
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_branch" id="branchRadio_none" value="未指定" checked="true"/>
+										未指定
+									</label>
+								</p>
+							</div>
+						</div>
+
+						<div class="row form-group person">
+							<div class="col-md-6">
+								<label>発信元</label>
+								<input type="text" id="personRequestText" class="form-control" name="work_tx_person_request" placeholder="" maxlength="40" />
+							</div>
+							<div class="col-md-6">
+								<label>担当者</label>
+								<!-- <input type="text" id="personInChargeText" class="form-control" name="work_tx_person_in_charge" maxlength="20" /> -->
+								<select id="personInChargeSelect" class="form-control" name="work_sl_person_in_charge">
+									<option value="user1">user1</option>
+									<option value="user3">user3</option>
+									<option value="user4">user4</option>
+									<option value="user5">user5</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="row form-group work-type">
+							<div class="col-md-4">
+								<label>作業分類</label>
+								<select id="worktypeSelect" class="form-control" name="work_sl_type">
+									<option value="質問・操作">質問・操作</option>
+									<option value="情報収集">情報収集</option>
+									<option value="調査">調査</option>
+									<option value="データメンテ">データメンテ</option>
+									<option value="依頼修正">依頼修正</option>
+									<option value="不具合">不具合</option>
+									<option value="その他">その他</option>
+								</select>
+							</div>
+							<div class="col-md-4">
+								<label>原因所在</label>
+								<select id="originLocationSelect" class="form-control" name="work_sl_origin_location">
+									<option value="N">NDBS</option>
+									<option value="H" selected>支店Z</option>
+									<option value="C">センター</option>
+									<option value="U">その他（不特定）</option>
+								</select>
+							</div>
+							<div class="col-md-4">
+								<label>対象分類</label>
+								<select id="originSystemSelect" class="form-control" name="work_sl_origin_system">
+									<option value="h">H/W</option>
+									<option value="o">OS</option>
+									<option value="n">N/W</option>
+									<option value="a">Application</option>
+									<option value="d">DB</option>
+									<option value="e" selected>etc</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group work-title">
+							<label>タイトル</label><span>全角100桁</span>
+							<input type="text" id="workTitleText" class="form-control" name="work_tx_title" placeholder="" maxlength="100" />
+						</div>
+
+						<div class="form-group work-detail">
+							<label>内容</label>
+							<textarea id="workDetailTextarea" class="form-control" rows="6" name="work_ta_detail"></textarea>
+						</div>
+
+						<div class="form-group work-manage">
+							<label>対処</label>
+							<textarea id="workManageTextarea" class="form-control" rows="6" name="work_ta_manage"></textarea>
+						</div>
+
+						<div class="form-group work-comment">
+							<label>コメント</label>
+							<textarea id="workCommentTextarea" class="form-control" rows="2" name="work_ta_comment"></textarea>
+						</div>
+
+						<div class="row form-group">
+							<div class="col-md-3 work-time">
+								<label>作業時間（分）</label>
+								<input type="text" id="workTimeText" class="form-control" name="work_tx_work_time" placeholder="数字のみ" maxlength="5" />
+							</div>
+							<div class="col-md-5 work-status">
+								<label>状況</label>
+								<div>
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_status" id="statusRadio_occured" value="発生" checked="true" />
+										発生
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_status" id="statusRadio_inProcess" value="中間" />
+										中間
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_status" id="statusRadio_complete" value="済" />
+										済
+									</label>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<label>月次報告対象</label>
+								<div class="">
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_flag_report" id="reportRadio_on" value="1" checked="true"/>
+										する
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_flag_report" id="reportRadio_off" value="0"/>
+										しない
+									</label>
+								</div>
+							</div>
+						</div>
+
+						<div class="row form-group">
+							<div class="col-md-12">
+								<label>最終確認</label>
+								<div class="">
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_final_check" id="finalCheckRadio_need" value="0" checked="true"/>
+										未確認
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_final_check" id="finalCheckRadio_complete" value="1"/>
+										確認済
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="work_rb_final_check" id="finalCheckRadio_noneed" value="9"/>
+										不要
+									</label>
+								</div>
+							</div>
+						</div>
+								
+					</div>
+
+					<div class="modal-footer form-group">
+						<div id="div_errMsg_wi"></div>
+						<button type="button" class="cancel btn btn-default" data-dismiss="modal">閉じる</button>
+						<button type="button" class="send btn btn-primary">登録</button>
+					</div>
+
+					<input type="hidden" name="work_hn_id" id="workIdHidden" />
+
+				</form>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+	<!-- Modal : workdetail-->
+	<div class="modal fade" id="workdetail" tabindex="-2" role="dialog" aria-labelledby="workdetailLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="workdetailLabel"></h4>
+				</div>
+				<div class="modal-body">
+
+					<table class="table table-bordered">
+						<thead></thead>
+						<tbody>
+							<tr>
+								<th class="width-14per">発生日時</th><td class="work-date-start width-20per"></td>
+								<th class="width-13per">納期</th><td class="work-date-demand width-20per"></td>
+								<th class="width-13per">回復日時</th><td class="work-date-end width-20per"></td>
+							</tr>
+							<tr>
+								<th>拠点</th><td class="work-branch"></td>
+								<th>発信元</th><td class="work-person-request"></td>
+								<th>担当者</th><td class="work-person-in-charge"></td>
+							</tr>
+							<tr>
+								<th>作業分類</th><td class="work-type"></td>
+								<th>原因所在</th><td class="work-origin-location"></td>
+								<th>対象分類</th><td class="work-origin-system"></td>
+							</tr>
+							<!-- <tr>
+								<th>タイトル</th><td colspan="5"><pre class="work-title font-size-1dot2em"></pre></td>
+							</tr> -->
+							<tr>
+								<th>内容</th><td colspan="5"><pre class="work-detail line-height-2em"></pre></td>
+							</tr>
+							<tr>
+								<th>対処</th><td colspan="5"><pre class="work-manage line-height-2em"></pre></td>
+							</tr>
+							<tr>
+								<th>コメント</th><td colspan="5"><pre class="work-comment"></pre></td>
+							</tr>
+							<tr>
+								<th>作業時間(分)</th><td class="work-time"></td>
+								<th>状況</th><td class="work-status"></td>
+								<th>月次報告対象</th><td class="work-flag-report"></td>
+							</tr>
+							<tr>
+								<th>最終確認</th><td colspan="5" class="work-final-check"></td>
+							</tr>
+						</tbody>
+					</table>
+	        
+					<hr/>
+
+					<table class="table table-bordered work-record-info">
+						<thead></thead>
+						<tbody>
+							<tr><th>記入者IP</th><td class="work-writer-ip"></td></tr>
+							<tr><th>最初入力日時</th><td class="work-insert-date"></td></tr>
+							<tr><th>最終更新日時</th><td class="work-update-date"></td></tr>
+						</tbody>
+					</table>
+
+					<!-- 押印欄（プリントのみ） -->
+					<div class="row">
+						<div class="col-xs-8">
+						</div>
+						<div class="col-xs-4">
+							<table class="table table-bordered work-print-seal">
+								<thead></thead>
+								<tbody>
+									<tr><th>責任者</th><th>作業１</th><th>作業２</th></tr>
+									<tr><td></td><td></td><td></td></tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default print-detail">印刷</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+	<!-- Modal : calldetail -->
+	<div class="modal fade" id="calldetail" tabindex="-3" role="dialog" aria-labelledby="calldetailLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="calldetailLabel">修正</h4>
+				</div>
+				<div class="modal-body">
+
+					
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+
+	<!-- Modal : change log -->
+	<div class="modal fade" id="changelog" tabindex="-4" role="dialog" aria-labelledby="changelog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title">変更履歴</h4>
+				</div>
+				<div class="modal-body">
+					
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- footer -->
+	<div class="row">
+		<div class="col-md-6">
+		</div>
+		<div class="col-md-6 text-right">
+			<div class="footer"><a id="anchor_changelog">ver 1.27</a></div>
+		</div>
+	</div>
+	
+	<!-- js -->
+	<script src="js/jquery-1.10.2.js"></script>
+	<script src="js/jquery-ui-1.10.3.custom.min.js"></script>
+	<script src="js/jquery.blockUI.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/typeahead.min.js"></script>
+	<script src="js/json2.js"></script>
+	<script src="js/MameReception.js?ver=20190612"></script>
+
+	<!-- js custom -->
+	<script>
+		var href = window.location.href;
+		var url = new URL(href);
+		var paramKey = url.searchParams.get("key");
+
+		if ( !paramKey ){
+			window.location.replace( url.href.split("?")[0] + "?key=" + Math.round(Math.random() * 1000000) );
+			//window.location.reload( true );
+		}
+	</script>
+</body>
+</html>
